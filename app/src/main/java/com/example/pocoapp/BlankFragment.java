@@ -5,22 +5,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import android.widget.Button;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 public class BlankFragment extends Fragment {
 
-    private static final String TAG = "BlankFragment";
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_blank, container, false);
+
         // Récupère le bouton dans la vue
         Button btnFragment = view.findViewById(R.id.btnFragment);
 
@@ -29,10 +27,26 @@ public class BlankFragment extends Fragment {
             FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
             FragmentTransaction transaction = fragmentManager.beginTransaction();
             transaction.replace(R.id.container, new SearchOpponentFragment());
+
+
+            // Ajoute la transaction à la back stack pour pouvoir revenir en arrière
             transaction.addToBackStack(null);
             transaction.commit();
+            fragmentManager.addOnBackStackChangedListener(() -> {
+                if (fragmentManager.getBackStackEntryCount() == 0) {
+                    View btnMute = requireActivity().findViewById(R.id.btnMute);
+                    if (btnMute != null) {
+                        btnMute.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
+
         });
 
         return view;
     }
+
+
+
+
 }
