@@ -26,7 +26,8 @@
             android:name=".PokemonGuessActivity"
             android:exported="false"
             android:label="@string/title_activity_pokemon_guess"
-            android:theme="@style/Theme.MyApplication" />
+            android:theme="@style/Theme.MyApplication"
+            android:screenOrientation="portrait"/>
         <!-- Déclaration de MainActivity -->
         <activity
             android:name=".MainActivity"
