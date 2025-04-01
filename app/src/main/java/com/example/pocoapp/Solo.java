@@ -1,14 +1,15 @@
 package com.example.pocoapp;
 
+import android.content.Intent; // Ajout de l'import
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import android.widget.Button;
+
 public class Solo extends Fragment {
 
     @Nullable
@@ -19,8 +20,11 @@ public class Solo extends Fragment {
 
         // Ajoute un écouteur de clic
         btnFragment.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Fragment cliqué !", Toast.LENGTH_SHORT).show();
+            // Démarre ResultateActivity
+            Intent intent = new Intent(requireActivity(), GameActivity.class);
+            startActivity(intent);
         });
+
         return view;
     }
 }

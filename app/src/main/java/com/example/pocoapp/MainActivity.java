@@ -1,21 +1,22 @@
 package com.example.pocoapp;
 
-import android.os.Bundle;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.appcompat.widget.Toolbar;
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
-import com.google.android.material.button.MaterialButton;
+import android.os.Bundle;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
+
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 public class MainActivity extends AppCompatActivity {
-    private MediaPlayer mediaPlayer;
+    public static MediaPlayer mediaPlayer; // MediaPlayer partagé avec ResultateActivity
     private boolean isMuted = false;
     private ImageButton btnMute;
     private GestureDetector gestureDetector;
@@ -27,22 +28,36 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         enableImmersiveMode();
 
+        // Initialisation du gestureDetector pour détecter les swipes
+        gestureDetector = new GestureDetector(this, new SwipeGestureListener());
+
         // Initialisation de la toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.logopocollection);
 
-        // Initialisation du détecteur de gestes
-        gestureDetector = new GestureDetector(this, new SwipeGestureListener());
+        // Chargement de l'état du son depuis les préférences
+        SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
+        isMuted = prefs.getBoolean("isMuted", false);
 
-        // Initialisation du MediaPlayer
-        mediaPlayer = MediaPlayer.create(this, R.raw.musiquepokemon);
-        mediaPlayer.setLooping(true);
-        mediaPlayer.start();
+        // Initialisation du MediaPlayer UNE SEULE FOIS
+        if (mediaPlayer == null) {
+            mediaPlayer = MediaPlayer.create(this, R.raw.musiquepokemon);
+            mediaPlayer.setLooping(true);
+            Log.d("DEBUG", "MainActivity - MediaPlayer initialisé");
+
+            if (!isMuted) {
+                mediaPlayer.start();
+                Log.d("DEBUG", "MainActivity - Musique lancée");
+            }
+        } else {
+            Log.d("DEBUG", "MainActivity - MediaPlayer existant");
+        }
 
         // Initialisation du bouton mute
         btnMute = findViewById(R.id.btnMute);
+        updateMuteIcon(); // Met à jour l'icône au démarrage
         btnMute.setOnClickListener(v -> toggleSound());
 
         // Gestion des fragments
@@ -51,19 +66,59 @@ public class MainActivity extends AppCompatActivity {
 
         fragmentTransaction.add(R.id.fragment_multi, new BlankFragment());
         fragmentTransaction.add(R.id.fragment_solo, new Solo());
-        fragmentTransaction.commit();
 
+        fragmentTransaction.commit();
     }
 
     private void toggleSound() {
-        if (isMuted) {
-            mediaPlayer.start();
-            btnMute.setImageResource(R.drawable.baseline_music_note_24); // Icône musique active
-        } else {
-            mediaPlayer.pause();
-            btnMute.setImageResource(R.drawable.baseline_music_off_24); // Icône musique coupée
-        }
         isMuted = !isMuted;
+
+        // Sauvegarde du statut du son dans les préférences
+        SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("isMuted", isMuted);
+        editor.apply();
+
+        if (mediaPlayer != null) {
+            if (isMuted) {
+                mediaPlayer.pause();
+                Log.d("DEBUG", "MainActivity - Musique en pause");
+            } else {
+                mediaPlayer.start();
+                Log.d("DEBUG", "MainActivity - Musique relancée");
+            }
+        }
+
+        updateMuteIcon();
+    }
+
+    private void updateMuteIcon() {
+        if (btnMute != null) {
+            btnMute.setImageResource(isMuted ? R.drawable.baseline_music_off_24 : R.drawable.baseline_music_note_24);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+            Log.d("DEBUG", "MainActivity - Musique mise en pause (veille)");
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
+        isMuted = prefs.getBoolean("isMuted", false);
+
+        if (mediaPlayer != null && !isMuted) {
+            mediaPlayer.start();
+            Log.d("DEBUG", "MainActivity - Musique relancée après veille");
+        }
+
+        updateMuteIcon();
     }
 
     @Override
@@ -95,10 +150,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        return gestureDetector.onTouchEvent(event) || super.onTouchEvent(event);
+        return (gestureDetector != null && gestureDetector.onTouchEvent(event)) || super.onTouchEvent(event);
     }
 
-    // Déplacement de la classe SwipeGestureListener en dehors des autres méthodes
+    // Gestion du swipe pour revenir en arrière
     private class SwipeGestureListener extends GestureDetector.SimpleOnGestureListener {
         private static final int SWIPE_THRESHOLD = 100;
         private static final int SWIPE_VELOCITY_THRESHOLD = 100;
