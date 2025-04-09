@@ -5,25 +5,14 @@ import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.example.pocoapp.PokeApi;
-import com.example.pocoapp.PokemonResponse;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -98,7 +87,7 @@ public class PokemonGuessActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        PokeApi pokeAPI = retrofit.create(PokeApi.class);
+        /*PokeApi pokeAPI = retrofit.create(PokeApi.class);
 
         pokeAPI.getPokemonList(20, 0).enqueue(new Callback<PokemonListResponse>() {
             @Override
@@ -122,7 +111,7 @@ public class PokemonGuessActivity extends AppCompatActivity {
                 System.out.println("Erreur Réseau: " + t.getMessage()); // Debug
                 Toast.makeText(PokemonGuessActivity.this, "Erreur de connexion", Toast.LENGTH_SHORT).show();
             }
-        });
+        });*/
     }
 
 }
