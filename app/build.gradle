@@ -41,9 +41,9 @@ dependencies {
     implementation libs.converter.gson
     implementation libs.cardview
     implementation libs.glide.v4120
+    implementation libs.recyclerview
     annotationProcessor libs.compiler.v4120
     implementation libs.appcompat
-    implementation libs.appcompat.v161  // Support pour Toolbar
     implementation libs.material.v190
     implementation libs.play.services.nearby
     implementation libs.glide

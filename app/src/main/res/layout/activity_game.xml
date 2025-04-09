@@ -1,68 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/gameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@color/primaryColor"
     tools:context=".GameActivity">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:background="@color/primaryColor">
+    <!-- Conteneur pour les indicateurs de tour et le timer -->
 
-        <GridLayout
-            android:id="@+id/gridLayout"
+    <!-- Grille du jeu -->
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:gravity="center|start|top">
+
+        <!-- Joueur 1 (Rouge) - Oval -->
+        <View
+            android:id="@+id/player1_turn"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="16dp"
+            android:background="@drawable/oval_red" />
+
+        <!-- Joueur 2 (Vert) - Oval -->
+        <View
+            android:id="@+id/player2_turn"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/oval_green" />
+
+        <!-- Timer au centre -->
+        <TextView
+            android:id="@+id/timerText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:columnCount="3"
-            android:padding="16dp"
-            android:rowCount="3"
-            android:background="@color/myTextColor">
+            android:layout_centerInParent="true"
+            android:text="15"
+            android:textColor="@color/myTextColor"
+            android:textSize="32sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
 
-            <!-- 9 boutons pour la grille -->
-            <Button
-                android:id="@+id/btn_0_0"
-                style="@style/GridButton"
-                />
 
-            <Button
-                android:id="@+id/btn_0_1"
-                style="@style/GridButton" />
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_grid"
+        android:name="com.example.pocoapp.GridFragment"
+        android:layout_width="394dp"
+        android:layout_height="308dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="50dp"
+        android:gravity="center" />
 
-            <Button
-                android:id="@+id/btn_0_2"
-                style="@style/GridButton" />
-
-            <Button
-                android:id="@+id/btn_1_0"
-                style="@style/GridButton" />
-
-            <Button
-                android:id="@+id/btn_1_1"
-                style="@style/GridButton" />
-
-            <Button
-                android:id="@+id/btn_1_2"
-                style="@style/GridButton" />
-
-            <Button
-                android:id="@+id/btn_2_0"
-                style="@style/GridButton" />
-
-            <Button
-                android:id="@+id/btn_2_1"
-                style="@style/GridButton" />
-
-            <Button
-                android:id="@+id/btn_2_2"
-                style="@style/GridButton"
-                 />
-
-        </GridLayout>
-
-    </LinearLayout>
-
-</FrameLayout>
+    <ImageButton
+        android:id="@+id/btnMute"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="bottom|left"
+        android:layout_marginTop="16dp"
+        android:background="@color/myTextColor"
+        android:backgroundTint="@android:color/transparent"
+        android:contentDescription="Toggle Music"
+        android:src="@drawable/baseline_music_note_24" />
+</LinearLayout>

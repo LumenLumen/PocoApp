@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".GridFragment">
+    <GridLayout
+        android:id="@+id/gridLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/myTextColor"
+        android:columnCount="3"
+        android:padding="16dp"
+        android:rowCount="3">
+
+        <!-- 9 boutons pour la grille -->
+        <Button
+            android:id="@+id/btn_0_0"
+            style="@style/GridButton" />
+
+        <Button
+            android:id="@+id/btn_0_1"
+            style="@style/GridButton" />
+
+        <Button
+            android:id="@+id/btn_0_2"
+            style="@style/GridButton" />
+
+        <Button
+            android:id="@+id/btn_1_0"
+            style="@style/GridButton" />
+
+        <Button
+            android:id="@+id/btn_1_1"
+            style="@style/GridButton" />
+
+        <Button
+            android:id="@+id/btn_1_2"
+            style="@style/GridButton" />
+
+        <Button
+            android:id="@+id/btn_2_0"
+            style="@style/GridButton" />
+
+        <Button
+            android:id="@+id/btn_2_1"
+            style="@style/GridButton" />
+
+        <Button
+            android:id="@+id/btn_2_2"
+            style="@style/GridButton" />
+
+    </GridLayout>
+
+</FrameLayout>
