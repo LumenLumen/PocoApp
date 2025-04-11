@@ -9,8 +9,6 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 public class Solo extends Fragment {
 
@@ -23,12 +21,8 @@ public class Solo extends Fragment {
         // Ajoute un écouteur de clic
         btnFragment.setOnClickListener(v -> {
             // Démarre ResultateActivity
-            //Intent intent = new Intent(requireActivity(), GameActivity.class);
-            FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.replace(R.id.container, new AledClass());
-
-            transaction.commit();
+            Intent intent = new Intent(requireActivity(), GameActivity.class);
+            startActivity(intent);
         });
 
         return view;
