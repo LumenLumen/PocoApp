@@ -31,6 +31,10 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
+        // Initialisation du singleton avec le contexte de l'application
+        GameController.getInstance().initContexte(getApplicationContext());
+        GameController.getInstance().initMorpion(); //Initialise la grille de morpion avec des Pokemoms
+
         enableImmersiveMode();
         timerText = findViewById(R.id.timerText);
         startTimer();
