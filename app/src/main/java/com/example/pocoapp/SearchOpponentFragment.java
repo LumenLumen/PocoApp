@@ -65,7 +65,7 @@ public class SearchOpponentFragment extends Fragment {
     }
 
     private void startDiscovery() {
-        statusText.setText("Recherche d'un adversaire...");
+        statusText.setText(getString(R.string.search_opponent));
 
         connectionsClient.startDiscovery(
                 SERVICE_ID,
@@ -73,7 +73,7 @@ public class SearchOpponentFragment extends Fragment {
                     @Override
                     public void onEndpointFound(@NonNull String endpointId, @NonNull com.google.android.gms.nearby.connection.DiscoveredEndpointInfo info) {
                         Log.d("Nearby", "Adversaire trouvé : " + endpointId);
-                        statusText.setText("Adversaire trouvé, connexion en cours...");
+                        statusText.setText(getString(R.string.opponent_found_connecting));
 
                         connectionsClient.requestConnection("Joueur", endpointId, connectionLifecycleCallback);
                     }
@@ -81,7 +81,7 @@ public class SearchOpponentFragment extends Fragment {
                     @Override
                     public void onEndpointLost(@NonNull String endpointId) {
                         Log.d("Nearby", "Adversaire perdu");
-                        statusText.setText("Aucun adversaire trouvé...");
+                        statusText.setText(getString(R.string.opponent_not_found));
                     }
                 },
                 new com.google.android.gms.nearby.connection.DiscoveryOptions(STRATEGY)
@@ -99,20 +99,20 @@ public class SearchOpponentFragment extends Fragment {
         public void onConnectionResult(@NonNull String endpointId, @NonNull ConnectionResolution result) {
             if (result.getStatus().isSuccess()) {
                 Log.d("Nearby", "Connexion réussie !");
-                statusText.setText("Adversaire connecté !");
+                statusText.setText(getString(R.string.opponent_connected));
                 loadingSpinner.setVisibility(View.GONE);
                 opponentFoundIcon.setVisibility(View.VISIBLE);
                 opponentEndpointId = endpointId;
             } else {
                 Log.d("Nearby", "Échec de la connexion");
-                statusText.setText("Connexion échouée");
+                statusText.setText(getString(R.string.connection_failed));
             }
         }
 
         @Override
         public void onDisconnected(@NonNull String endpointId) {
             Log.d("Nearby", "Déconnexion de " + endpointId);
-            statusText.setText("Adversaire déconnecté");
+            statusText.setText(getString(R.string.opponent_disconnected));
             opponentEndpointId = null;
         }
     };
@@ -122,7 +122,7 @@ public class SearchOpponentFragment extends Fragment {
         public void onPayloadReceived(@NonNull String endpointId, @NonNull Payload payload) {
             String receivedMessage = new String(payload.asBytes(), StandardCharsets.UTF_8);
             Log.d("Nearby", "Message reçu : " + receivedMessage);
-            statusText.setText("Message reçu : " + receivedMessage);
+            statusText.setText(getString(R.string.message_received, receivedMessage));
         }
 
         @Override

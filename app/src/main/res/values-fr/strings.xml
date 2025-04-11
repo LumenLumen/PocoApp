@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pocollection</string>
+    <string name="solo_title">Solo</string>
+    <color name="text">#FFDF81</color>
+    <string name="solo_subtitle">Défier la machine</string>
+    <string name="mute">Couper le son</string>
+    <string name="unmute">Activer le son</string>
+    <string name="multi_subtitle">trouver un adversaire</string>
+    <string name="search_opponent">Recherche d\'un adversaire</string>
+    <string name="opponent_found_connecting">Adversaire trouvé, connexion en cours...</string>
+    <string name="opponent_not_found">Aucun adversaire trouvé...</string>
+    <string name="opponent_connected">Adversaire connecté !</string>
+    <string name="connection_failed">Connexion échouée</string>
+    <string name="opponent_disconnected">Adversaire déconnecté</string>
+    <string name="message_received">Message reçu : %1$s</string>
+    <string name="victoire">Victoire !</string>
+    <string name="defaite">Défaite !</string>
+    <string name="rejouer">Rejouer</string>
+    <string name="menu">Menu</string>
+    <string name="choose_language">Choisir la langue</string>
+    <string name="lang_en">Anglais</string>
+    <string name="lang_fr">Français</string>
+    <string name="game_mode_solo">Mode Solo</string>
+    <string name="game_mode_multi">Mode Multijoueur</string>
+    <string name="confirm">Confirmer</string>
+    <string name="cancel">Annuler</string>
+    <string name="exit_game">Quitter le jeu</string>
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
+</resources>

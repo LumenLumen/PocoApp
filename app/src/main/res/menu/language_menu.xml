@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/text">
+    <item
+        android:id="@+id/lang_fr"
+        android:title="français"
+        android:icon="@drawable/flagfrance"
+        android:color="@color/text"/>
+    <item
+        android:id="@+id/lang_en"
+        android:title="English"
+        android:icon="@drawable/flagen"
+        android:color="@color/text"/>
+</menu>

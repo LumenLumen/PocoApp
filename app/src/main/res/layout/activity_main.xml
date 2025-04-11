@@ -8,26 +8,30 @@
     tools:context=".MainActivity">
 
     <!-- Barre d'outils -->
+
+    <!-- Conteneur principal -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:background="@color/primaryColor"
         android:elevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
             android:layout_marginTop="10dp"
+            android:padding="10dp"
             tools:layout_editor_absoluteX="16dp">
 
             <ImageView
                 android:id="@+id/logoImage"
-                android:layout_width="80dp"
+                android:layout_width="70dp"
                 android:layout_height="80dp"
                 android:layout_alignParentStart="true"
                 android:layout_marginStart="0dp"
@@ -38,7 +42,7 @@
                 android:layout_width="295dp"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="5dp"
                 android:layout_toEndOf="@id/logoImage"
                 android:text="Pocollection"
                 android:textColor="#FFDF81"
@@ -48,7 +52,6 @@
 
     </androidx.appcompat.widget.Toolbar>
 
-    <!-- Conteneur principal -->
     <LinearLayout
         android:id="@+id/container"
         android:layout_width="0dp"
@@ -89,27 +92,46 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="0.25" />
+
     </LinearLayout>
 
 
 
-    <!-- Bouton Mute en bas -->
+        <!-- Bouton Mute en bas -->
+        <ImageButton
+            android:id="@+id/btnMute"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="4dp"
+            android:background="@color/myTextColor"
+            android:backgroundTint="@android:color/transparent"
+            android:contentDescription="Toggle Music"
+            android:src="@drawable/baseline_music_note_24"
+            android:visibility="visible"
+            android:layout_gravity="bottom|left"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:visibility="visible"
+            android:layout_weight="0.25"
+        />
+
     <ImageButton
-        android:id="@+id/btnMute"
+        android:id="@+id/btnlangue"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:layout_gravity="bottom|left"
         android:layout_marginBottom="4dp"
+        android:layout_toEndOf="@id/btnMute"
         android:background="@color/myTextColor"
         android:backgroundTint="@android:color/transparent"
-        android:contentDescription="Toggle Music"
-        android:src="@drawable/baseline_music_note_24"
+        android:src="@drawable/baseline_language_24"
         android:visibility="visible"
-        android:layout_gravity="bottom|left"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.138"
         app:layout_constraintStart_toStartOf="parent"
-        tools:visibility="visible"
-        android:layout_weight="0.25"/>
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
