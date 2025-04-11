@@ -3,6 +3,7 @@ package com.example.pocoapp;
 import androidx.annotation.NonNull;
 
 public class Pokemon {
+    private int id ;
     private String english_name;
     private String french_name ;
     private String[] types;
@@ -10,6 +11,15 @@ public class Pokemon {
     private float taille;
     private int generation;
     private String image;
+
+    // Getter et Setter pour 'id'
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     // Getter et Setter pour 'name'
     public String getFrench_name() {
