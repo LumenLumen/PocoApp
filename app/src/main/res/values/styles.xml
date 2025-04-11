@@ -7,6 +7,8 @@
         <item name="android:backgroundTint">@color/myTextColor</item>
         <item name="android:textSize">24sp</item>
 
-        <item name="android:text">"?"</item>
+        <!--<item name="android:text">"?"</item>-->
+
+
     </style>
 </resources>
