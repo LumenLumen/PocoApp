@@ -1,7 +1,8 @@
 package com.example.pocoapp;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.annotation.Nullable;
+// Import the FileWriter class
+// Import the IOException class to handle errors
 
-import android.content.Intent;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -12,12 +13,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+
 public class GridFragment extends Fragment {
 
     private Button[][] gridButtons = new Button[3][3];
 
     public GridFragment() {
         // Constructeur vide requis
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -34,6 +48,10 @@ public class GridFragment extends Fragment {
                 if (gridButtons[row][col] != null) {
                     int finalRow = row;
                     int finalCol = col;
+
+                    gridButtons[row][col].setText(GameController.getInstance().getPkmnATrouver(row,col).getFrench_name()); //.getFrench_name()); //Commenter si pas en test
+
+                    //Action sur clic
                     gridButtons[row][col].setOnClickListener(v -> {
                         FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
                         FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -60,8 +78,4 @@ public class GridFragment extends Fragment {
 
         return rootView;
     }
-
-
-
-
-}
+    }

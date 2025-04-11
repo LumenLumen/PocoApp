@@ -38,6 +38,9 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
+        // Initialisation du singleton avec le contexte de l'application
+        GameController.getInstance().initContexte(getApplicationContext());
+
         enableImmersiveMode();
         timerText = findViewById(R.id.timerText);
         startTimer();
