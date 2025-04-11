@@ -1,6 +1,8 @@
 package com.example.pocoapp;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -14,6 +16,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import java.util.Locale;
+
 public class GameActivity extends AppCompatActivity {
 
     public static MediaPlayer mediaPlayer;
@@ -25,7 +29,10 @@ public class GameActivity extends AppCompatActivity {
     private int timeLeft = 15; // 15 secondes pour chaque joueur
     private boolean isTimerRunning = false;
 
-
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleHelper.setLocale(newBase));
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -53,10 +53,10 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_grid"
         android:name="com.example.pocoapp.GridFragment"
-        android:layout_width="394dp"
+        android:layout_width="378dp"
         android:layout_height="308dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginLeft="15dp"
+        android:layout_marginLeft="7dp"
         android:layout_marginTop="50dp"
         android:gravity="center" />
 

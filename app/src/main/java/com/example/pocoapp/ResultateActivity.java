@@ -41,10 +41,11 @@ public class ResultateActivity extends AppCompatActivity {
         Log.d("DEBUG", "isWin = " + isWin);
 
         if (isWin) {
-            resultText.setText("Gagné !");
+            resultText.setText(getString(R.string.victoire));
             showVictoryScreen();
         } else {
-            resultText.setText("Perdu !");
+            resultText.setText(getString(R.string.defaite));
+
             showDefeatScreen();
         }
 
