@@ -82,4 +82,5 @@ public class Pokemon {
     public void setImage(String image) {
         this.image = image;
     }
+
 }

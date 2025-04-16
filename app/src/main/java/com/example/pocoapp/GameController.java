@@ -27,7 +27,6 @@ public class GameController {
                 caseTrouvee[i][j] = "";
             }
         }
-        initMorpion();
     }
 
     /*Méthode de classe pour obtenir l'instance de GameController ou la créer*/
@@ -163,6 +162,15 @@ public class GameController {
         }
 
         return reponse;
+    }
+    private boolean[][] estDevine = new boolean[3][3];
+
+    public boolean estDevine(int row, int col) {
+        return estDevine[row][col];
+    }
+
+    public void setPokemonDevine(int row, int col, boolean valeur) {
+        estDevine[row][col] = valeur;
     }
 
     /*================== FONCTIONS DE RENVOI DES DETAILS =================
