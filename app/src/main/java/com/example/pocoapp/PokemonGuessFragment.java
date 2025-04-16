@@ -1,16 +1,13 @@
 package com.example.pocoapp;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,10 +19,8 @@ public class PokemonGuessFragment extends Fragment {
 
     private RecyclerView pokemonGrid;
     private PokemonGridAdapter adapter;
-    private EditText guessInput;
     private List<String> pokemonImages = new ArrayList<>();
     private List<String> pokemonNames = new ArrayList<>();
-
     private GestureDetector gestureDetector;
 
     private int row, col;
@@ -52,9 +47,7 @@ public class PokemonGuessFragment extends Fragment {
 
         pokemonGrid.setLayoutManager(new GridLayoutManager(getContext(), 4));
 
-        // Initialiser l'adaptateur avec les images des Pokémon suggérés
         adapter = new PokemonGridAdapter(getContext(), pokemonImages, pokemonNames, pokemonName -> {
-            // Exécution au clic sur un Pokémon dans la grille
             Pokemon aDeviner = GameController.getInstance().getPkmnATrouver(row, col);
             if (pokemonName.equalsIgnoreCase(aDeviner.getFrench_name())) {
                 GameController.getInstance().setPokemonDevine(row, col, true);
@@ -65,64 +58,59 @@ public class PokemonGuessFragment extends Fragment {
             requireActivity().getSupportFragmentManager().popBackStack();
         });
 
-
         pokemonGrid.setAdapter(adapter);
 
-        // Initialiser le GestureDetector pour capter les événements de swipe sur le RecyclerView
+        //  GESTURE DETECTOR pour swipe vers le bas
         gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
+            private static final int SWIPE_THRESHOLD = 100;
+            private static final int SWIPE_VELOCITY_THRESHOLD = 100;
+
+            @Override
+            public boolean onDown(MotionEvent e) {
+                return true; // Obligatoire pour que le fling soit détecté
+            }
+
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                // Si un swipe est détecté de droite à gauche (glissement de droite à gauche)
-                if (e2.getX() > e1.getX()) {
-                    getParentFragmentManager().popBackStack(); // Ferme le fragment
-                    return true;
+                if (e1 == null || e2 == null) return false;
+
+                float diffY = e2.getY() - e1.getY();
+
+                if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
+                    if (diffY > 0) {
+                        // Swipe vers le bas
+                        getParentFragmentManager().popBackStack();
+                        return true;
+                    }
                 }
                 return false;
             }
         });
 
-        // Ajouter un OnTouchListener au RecyclerView pour gérer le swipe
-        pokemonGrid.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
+        // Appliquer au layout global
+        rootView.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
 
-        // Charger les suggestions de Pokémon
+        // Charger les Pokémon suggérés
         loadPokemonSuggestions();
 
         return rootView;
     }
 
     private void loadPokemonSuggestions() {
-
         Pokemon[] suggestedPokemons = GameController.getInstance().suggestionPokemon(12, row, col);
 
-
         if (suggestedPokemons != null && suggestedPokemons.length > 0) {
-            pokemonImages.clear(); // Vider la liste avant de la remplir à nouveau
+            pokemonImages.clear();
             pokemonNames.clear();
             for (Pokemon p : suggestedPokemons) {
                 if (p != null) {
-                    pokemonImages.add(p.getImage()); // Utilisez la méthode appropriée pour obtenir l'image du Pokémon
+                    pokemonImages.add(p.getImage());
                     pokemonNames.add(p.getFrench_name());
                 }
             }
-            // Mettre à jour l'adaptateur pour afficher les Pokémon suggérés
             adapter.notifyDataSetChanged();
         } else {
-            // Gérer le cas où aucune suggestion n'est retournée
             Toast.makeText(getContext(), "Aucune suggestion de Pokémon disponible.", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-
-    public void verifierPokemonChoisi(Pokemon choisi) {
-        Pokemon aDeviner = GameController.getInstance().getPkmnATrouver(row, col);
-
-        if (choisi.getFrench_name().equalsIgnoreCase(aDeviner.getFrench_name())) {
-            GameController.getInstance().setPokemonDevine(row, col, true);
-
-            Toast.makeText(getContext(), "Bravo ! C'était le bon Pokémon !", Toast.LENGTH_SHORT).show();
-            requireActivity().getSupportFragmentManager().popBackStack(); // Revenir à GridFragment
-        } else {
-            Toast.makeText(getContext(), "Raté ! Ce n'était pas le bon Pokémon.", Toast.LENGTH_SHORT).show();
         }
     }
 }
