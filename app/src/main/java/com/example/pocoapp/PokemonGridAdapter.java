@@ -14,6 +14,8 @@ import java.util.List;
 public class PokemonGridAdapter extends RecyclerView.Adapter<PokemonGridAdapter.ViewHolder> {
     private Context context;
     private List<String> pokemonImages;
+    private List<String> pokemonNames;
+
     private OnPokemonClickListener listener;
 
     // Interface pour gérer les clics sur les Pokémon
@@ -21,11 +23,13 @@ public class PokemonGridAdapter extends RecyclerView.Adapter<PokemonGridAdapter.
         void onPokemonClick(String pokemonName);
     }
 
-    public PokemonGridAdapter(Context context, List<String> pokemonImages, OnPokemonClickListener listener) {
+    public PokemonGridAdapter(Context context, List<String> pokemonImages, List<String> pokemonNames, OnPokemonClickListener listener) {
         this.context = context;
         this.pokemonImages = pokemonImages;
+        this.pokemonNames = pokemonNames;
         this.listener = listener;
     }
+
 
     @NonNull
     @Override
@@ -37,6 +41,7 @@ public class PokemonGridAdapter extends RecyclerView.Adapter<PokemonGridAdapter.
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         String imageUrl = pokemonImages.get(position);
+        String pokemonName = pokemonNames.get(position);  // ici on récupère le bon nom
 
         // Charger l’image avec Glide
         Glide.with(context)
@@ -44,8 +49,7 @@ public class PokemonGridAdapter extends RecyclerView.Adapter<PokemonGridAdapter.
                 .into(holder.pokemonImageView);
 
         holder.itemView.setOnClickListener(v -> {
-            Toast.makeText(context, "Pokémon sélectionné !", Toast.LENGTH_SHORT).show();
-            listener.onPokemonClick("Pokémon " + position); // Remplace par un vrai nom plus tard
+            listener.onPokemonClick(pokemonName);
         });
     }
 
