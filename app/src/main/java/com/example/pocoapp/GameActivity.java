@@ -34,6 +34,7 @@ public class GameActivity extends AppCompatActivity {
 
         GameController.getInstance().initContexte(getApplicationContext());
         GameController.getInstance().initMorpion();
+
         enableImmersiveMode();
 
         timerText = findViewById(R.id.timerText);
