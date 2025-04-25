@@ -6,22 +6,33 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PokemonGuessFragment extends Fragment {
 
     private RecyclerView pokemonGrid;
     private PokemonGridAdapter adapter;
+    private Map<String, ImageView> typeIcons = new HashMap<>();
+
     private List<String> pokemonImages = new ArrayList<>();
     private List<String> pokemonNames = new ArrayList<>();
+
     private GestureDetector gestureDetector;
+    private AutoCompleteTextView input;
+    private Button submitButton;
 
     private int row, col;
 
@@ -39,6 +50,8 @@ public class PokemonGuessFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_pokemon_guess, container, false);
 
         pokemonGrid = rootView.findViewById(R.id.pokemon_list);
+        input = rootView.findViewById(R.id.pokemonAutoCompleteTextView);
+        submitButton = rootView.findViewById(R.id.submitButton);
 
         if (getArguments() != null) {
             row = getArguments().getInt("row");
@@ -48,52 +61,78 @@ public class PokemonGuessFragment extends Fragment {
         pokemonGrid.setLayoutManager(new GridLayoutManager(getContext(), 4));
 
         adapter = new PokemonGridAdapter(getContext(), pokemonImages, pokemonNames, pokemonName -> {
-            Pokemon aDeviner = GameController.getInstance().getPkmnATrouver(row, col);
-            if (pokemonName.equalsIgnoreCase(aDeviner.getFrench_name())) {
-                GameController.getInstance().setPokemonDevine(row, col, true);
-                Toast.makeText(getContext(), "Bravo ! C'était le bon Pokémon !", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getContext(), "Raté ! Ce n'était pas le bon Pokémon.", Toast.LENGTH_SHORT).show();
-            }
-            requireActivity().getSupportFragmentManager().popBackStack();
+            handleGuess(pokemonName);
         });
 
         pokemonGrid.setAdapter(adapter);
 
-        //  GESTURE DETECTOR pour swipe vers le bas
+        // Swipe vers le bas pour quitter
         gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
             private static final int SWIPE_THRESHOLD = 100;
             private static final int SWIPE_VELOCITY_THRESHOLD = 100;
 
             @Override
             public boolean onDown(MotionEvent e) {
-                return true; // Obligatoire pour que le fling soit détecté
+                return true;
             }
 
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
                 if (e1 == null || e2 == null) return false;
-
                 float diffY = e2.getY() - e1.getY();
-
-                if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
-                    if (diffY > 0) {
-                        // Swipe vers le bas
-                        getParentFragmentManager().popBackStack();
-                        return true;
-                    }
+                if (diffY > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
+                    requireActivity().getSupportFragmentManager().popBackStack();
+                    return true;
                 }
                 return false;
             }
         });
 
-        // Appliquer au layout global
         rootView.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
 
-        // Charger les Pokémon suggérés
+        // Chargement des suggestions
         loadPokemonSuggestions();
 
+        // Vérification via la barre de saisie
+        submitButton.setOnClickListener(v -> {
+            String guess = input.getText().toString().trim();
+            if (!guess.isEmpty()) {
+                handleGuess(guess);
+            }
+        });
+
         return rootView;
+    }
+    private void updateTypeDisplay(String[] proposedTypes, String[] correctTypes) {
+        for (Map.Entry<String, ImageView> entry : typeIcons.entrySet()) {
+            String type = entry.getKey();
+            ImageView icon = entry.getValue();
+
+            if (contains(correctTypes, type)) {
+                icon.setAlpha(1.0f); // type correct
+            } else if (contains(proposedTypes, type)) {
+                icon.setAlpha(0.3f); // type incorrect proposé
+            } else {
+                icon.setAlpha(1.0f); // pas proposé = neutre
+            }
+        }
+    }
+
+    private boolean contains(String[] array, String value) {
+        for (String s : array) {
+            if (s != null && s.equalsIgnoreCase(value)) return true;
+        }
+        return false;
+    }
+    private void handleGuess(String guessedName) {
+        Pokemon target = GameController.getInstance().getPkmnATrouver(row, col);
+        if (guessedName.equalsIgnoreCase(target.getFrench_name())) {
+            GameController.getInstance().setPokemonDevine(row, col, true);
+            Toast.makeText(getContext(), "Bravo ! C'était le bon Pokémon !", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getContext(), "Raté ! Ce n'était pas le bon Pokémon.", Toast.LENGTH_SHORT).show();
+        }
+        requireActivity().getSupportFragmentManager().popBackStack();
     }
 
     private void loadPokemonSuggestions() {

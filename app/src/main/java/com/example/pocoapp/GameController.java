@@ -28,6 +28,14 @@ public class GameController {
             }
         }
     }
+    private String opponentEndpointId;
+    public void setOpponentEndpointId(String id) { this.opponentEndpointId = id; }
+    public String getOpponentEndpointId() { return opponentEndpointId; }
+
+    private String playerRole = "Rouge"; // Valeur par défaut
+    public void setPlayerRole(String role) { this.playerRole = role; }
+    public String getPlayerRole() { return playerRole; }
+
 
     /*Méthode de classe pour obtenir l'instance de GameController ou la créer*/
     public static synchronized GameController getInstance() {
@@ -173,9 +181,11 @@ public class GameController {
         estDevine[row][col] = valeur;
     }
 
+
+
     /*================== FONCTIONS DE RENVOI DES DETAILS =================
     * *********************************************************************/
 
-    //A faire 
+    //A faire
 
 }

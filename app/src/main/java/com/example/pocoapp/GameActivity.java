@@ -1,8 +1,8 @@
 package com.example.pocoapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -12,55 +12,47 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import java.util.Locale;
-
 public class GameActivity extends AppCompatActivity {
-
+    private GameController gameController;
+    private View redIndicator, greenIndicator;
     public static MediaPlayer mediaPlayer;
     private boolean isMuted = false;
     private ImageButton btnMute;
-    private int currentPlayer = 1; // 1 pour Joueur 1, 2 pour Joueur 2
     private TextView timerText;
-    private CountDownTimer countDownTimer;
-    private int timeLeft = 15; // 15 secondes pour chaque joueur
-    private boolean isTimerRunning = false;
 
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(LocaleHelper.setLocale(newBase));
-    }
+    private int currentPlayer = 1; // 1 = Rouge, 2 = Vert
+    private CountDownTimer countDownTimer;
+    private boolean isTimerRunning = false;
+    private int timeLeft = 15;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        // Initialisation du singleton avec le contexte de l'application
         GameController.getInstance().initContexte(getApplicationContext());
         GameController.getInstance().initMorpion();
         enableImmersiveMode();
+
         timerText = findViewById(R.id.timerText);
-        startTimer();
-        // Initialisation du son
+        btnMute = findViewById(R.id.btnMute);
+
         SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
         isMuted = prefs.getBoolean("isMuted", false);
+
         if (mediaPlayer == null) {
             mediaPlayer = MediaPlayer.create(this, R.raw.bourgenvol);
             mediaPlayer.setLooping(true);
             if (!isMuted) mediaPlayer.start();
         }
 
-        // Initialisation du bouton mute
-        btnMute = findViewById(R.id.btnMute);
         updateMuteIcon();
         btnMute.setOnClickListener(v -> toggleSound());
-        // Initialisation des joueurs
-        updatePlayerTurn();
 
-        // Ajouter la grille comme fragment principal
+        updatePlayerTurn();
+        startTimer();
         showGridFragment();
     }
 
@@ -77,67 +69,77 @@ public class GameActivity extends AppCompatActivity {
         transaction.addToBackStack(null);
         transaction.commit();
     }
-    private void startTimer() {
-        if (isTimerRunning) {
-            countDownTimer.cancel();
-        }
 
-        countDownTimer = new CountDownTimer(timeLeft * 1000, 1000) {  // 1000ms = 1 seconde
+    public void handleCorrectGuess() {
+        changePlayer(); // Change de joueur uniquement si la réponse est correcte
+    }
+
+    private void startTimer() {
+        if (isTimerRunning) countDownTimer.cancel();
+
+        countDownTimer = new CountDownTimer(15_000, 1_000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                timeLeft = (int) millisUntilFinished / 1000;
+                timeLeft = (int) (millisUntilFinished / 1000);
                 timerText.setText(String.valueOf(timeLeft));
             }
 
             @Override
             public void onFinish() {
-                // Changer de joueur lorsque le timer expire
                 changePlayer();
             }
         }.start();
+
         isTimerRunning = true;
     }
 
     private void changePlayer() {
         currentPlayer = (currentPlayer == 1) ? 2 : 1;
-        updatePlayerTurn();  // Met à jour l'affichage du joueur courant
-
-        // Redémarre le timer pour l'autre joueur
-        timeLeft = 15;  // Réinitialiser le timer
+        updatePlayerTurn();
+        timeLeft = 15;
         startTimer();
     }
 
     private void updatePlayerTurn() {
-        // Si c'est le tour du Joueur 1
-        if (currentPlayer == 1) {
-            // Joueur 1 visible, Joueur 2 transparent
-            findViewById(R.id.player1_turn).setAlpha(1.0f);  // Joueur 1 opaque
-            findViewById(R.id.player2_turn).setAlpha(0.3f);  // Joueur 2 transparent
-        } else {
-            // Joueur 1 transparent, Joueur 2 visible
-            findViewById(R.id.player1_turn).setAlpha(0.3f);  // Joueur 1 transparent
-            findViewById(R.id.player2_turn).setAlpha(1.0f);  // Joueur 2 opaque
-        }
+        findViewById(R.id.player1_turn).setAlpha(currentPlayer == 1 ? 1.0f : 0.3f);
+        findViewById(R.id.player2_turn).setAlpha(currentPlayer == 2 ? 1.0f : 0.3f);
     }
-
 
     private void toggleSound() {
         isMuted = !isMuted;
+
+        // Sauvegarde du statut du son dans les préférences
         SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
-        prefs.edit().putBoolean("isMuted", isMuted).apply();
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("isMuted", isMuted);
+        editor.apply();
 
         if (mediaPlayer != null) {
-            if (isMuted) mediaPlayer.pause();
-            else mediaPlayer.start();
+            if (isMuted) {
+                mediaPlayer.pause();
+                Log.d("DEBUG", "MainActivity - Musique en pause");
+            } else {
+                mediaPlayer.start();
+                Log.d("DEBUG", "MainActivity - Musique relancée");
+            }
         }
 
         updateMuteIcon();
     }
 
     private void updateMuteIcon() {
-        if (btnMute != null) {
-            btnMute.setImageResource(isMuted ? R.drawable.baseline_music_off_24 : R.drawable.baseline_music_note_24);
-        }
+        btnMute.setImageResource(isMuted ? R.drawable.baseline_music_off_24 : R.drawable.baseline_music_note_24);
+    }
+    public void onBackToMenuClick(View view) {
+        // Crée un Intent pour revenir à l'écran principal
+        Intent intent = new Intent(GameActivity.this, MainActivity.class);
+        startActivity(intent); // Démarre l'activité principale
+
+        // Facultatif : Ajoute un effet de transition entre les activités
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
+
+        finish();
     }
 
     private void enableImmersiveMode() {
@@ -147,19 +149,16 @@ public class GameActivity extends AppCompatActivity {
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         decorView.setOnSystemUiVisibilityChangeListener(visibility -> enableImmersiveMode());
     }
+
     @Override
     protected void onPause() {
         super.onPause();
-        if (isTimerRunning) {
-            countDownTimer.cancel();
-        }
+        if (isTimerRunning) countDownTimer.cancel();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (isTimerRunning) {
-            startTimer();
-        }
+        if (!isTimerRunning) startTimer();
     }
 }

@@ -40,6 +40,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".GameActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="true"
             android:screenOrientation="portrait" />
     </application>
