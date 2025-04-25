@@ -190,6 +190,15 @@ public class GameController {
 
         return reponse;
     }
+    private boolean[][] estDevine = new boolean[3][3];
+
+    public boolean estDevine(int row, int col) {
+        return estDevine[row][col];
+    }
+
+    public void setPokemonDevine(int row, int col, boolean valeur) {
+        estDevine[row][col] = valeur;
+    }
 
     /*Simule le tour d'un joueur => robot qui joue aléatoirement*/
     public void tour_bot (){

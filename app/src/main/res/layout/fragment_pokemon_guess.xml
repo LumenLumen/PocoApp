@@ -5,9 +5,10 @@
     tools:context=".PokemonGuessFragment">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/pokemon_grid"
+        android:id="@+id/pokemon_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/timerText"
-        android:padding="16dp"/>
+        android:layout_height="wrap_content"
+        android:numColumns="3"
+        android:layout_margin="8dp"/>
+
 </FrameLayout>
