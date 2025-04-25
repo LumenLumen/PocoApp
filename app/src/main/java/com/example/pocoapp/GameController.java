@@ -12,12 +12,16 @@ import java.util.Random;
 /*Cette classe est un singleton.*/
 public class GameController {
 
-    private static GameController instance ; //signeton
+    private static GameController instance ; //singleton
     private Context context; //contexte
-    private Pokemon[][] pkmnATrouver = new Pokemon[3][3]; //Stocke les pkmn à trouver
-    private String[][] caseTrouvee = new String[3][3]; //Stocke les cases gagnées par qui
+    private final Pokemon[][] pkmnATrouver = new Pokemon[3][3]; //Stocke les pkmn à trouver
+    private final String[][] caseTrouvee = new String[3][3]; //Stocke les cases gagnées par qui
+    private InformationPokemon[][] informations = new InformationPokemon[3][3];
     @SuppressWarnings("unchecked")
-    private ArrayList<Pokemon>[][] pkmnDejaDit = (ArrayList<Pokemon>[][]) new ArrayList[3][3]; //Liste des pkmn déjà dit par case
+    private final ArrayList<Pokemon>[][] pkmnDejaDit = (ArrayList<Pokemon>[][]) new ArrayList[3][3]; //Liste des pkmn déjà dit par case
+
+    /* ================ INITIALISATION ===================
+    ======================================================*/
 
     /*Constructeur privé => Singleton*/
     private GameController (){
@@ -42,22 +46,27 @@ public class GameController {
         this.context = context.getApplicationContext(); // on garde le contexte d'application, évite les fuites de mémoire
     }
 
-    /*Getter d'un Pokemon d'une case*/
-    public Pokemon getPkmnATrouver(int i, int j){
-        return pkmnATrouver[i][j] ;
-    }
-
     /*Initialise la grille de morpion avec des Pokémons à trouver.*/
     public void initMorpion (){
         int max = 1025; //Nombre de Pokémon dans le Dex
         Random random = new Random();
+        int randomNum;
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                int randomNum = random.nextInt(max) + 1;
+                randomNum = random.nextInt(max) + 1;
                 pkmnATrouver[i][j] = getPokemon(randomNum);
+                informations[i][j] = new InformationPokemon(pkmnATrouver[i][j]);
             }
         }
+    }
+
+    /* ================ GETTERS ==========================
+    ======================================================*/
+
+    /*Getter d'un Pokemon d'une case*/
+    public Pokemon getPkmnATrouver(int i, int j){
+        return pkmnATrouver[i][j] ;
     }
 
     /*Cherche un Pokémon (dont le numéro est passé en paramètre) dans le fichier de DB.*/
@@ -99,7 +108,15 @@ public class GameController {
         return pkmn;
     }
 
-    /*Renvoie true si qqun à déjà ce Pokemon pour cette case.*/
+    /*Renvoie les informations connues d'un Pokemon sur une case*/
+    public InformationPokemon getInfos(int i, int j){
+        return this.informations[i][j];
+    }
+
+    /* ================ REPONSES ==========================
+    ======================================================*/
+
+    /*Renvoie true si qqun a déjà ce Pokemon pour cette case.*/
     public boolean isAlreadySaid (Pokemon pkmn, int i, int j){
         return pkmnDejaDit[i][j].contains(pkmn);
     }
@@ -117,29 +134,39 @@ public class GameController {
             return 1 ;
         }
         else {
+            informations[i][j].updateInformations(pkmn);
             pkmnDejaDit[i][j].add(pkmn);
             return 0 ;
         }
     }
 
-    /*Renvoie true si la partie est finie*/
-    public boolean isGameOver (){
+    /*Renvoie le nom du gagnant si la partie est finie, "--" si égalité, sinon une chaine vide.*/
+    public String isGameOver (){
+        //Si quelqu'un a gagné
         for (int i = 0 ; i < 3 ; i++){
             if (Objects.equals(caseTrouvee[i][0], caseTrouvee[i][1]) && Objects.equals(caseTrouvee[i][2], caseTrouvee[i][1]) && !Objects.equals(caseTrouvee[i][0], "")){
-                return true;
+                return caseTrouvee[i][0];
             }
             if (Objects.equals(caseTrouvee[0][i], caseTrouvee[1][i]) && Objects.equals(caseTrouvee[2][i], caseTrouvee[1][i]) && !Objects.equals(caseTrouvee[0][i], "")){
-                return true;
+                return caseTrouvee[0][i];
             }
         }
 
-        if (!Objects.equals(caseTrouvee[1][1], "")){
-            if (Objects.equals(caseTrouvee[0][0], caseTrouvee[1][1]) && Objects.equals(caseTrouvee[0][0], caseTrouvee[2][2])){
-                return true ;
+        if (!Objects.equals(caseTrouvee[1][1], "")){  //Diagonales
+            if ((Objects.equals(caseTrouvee[0][0], caseTrouvee[1][1]) && Objects.equals(caseTrouvee[0][0], caseTrouvee[2][2])) || (Objects.equals(caseTrouvee[0][2], caseTrouvee[1][1]) && Objects.equals(caseTrouvee[0][2], caseTrouvee[2][0]))){
+                return caseTrouvee[1][1];
             }
-            else return Objects.equals(caseTrouvee[0][2], caseTrouvee[1][1]) && Objects.equals(caseTrouvee[0][2], caseTrouvee[2][0]);
         }
-        return false ;
+
+        //S'il y a une égalité (la grille est pleine et sans vainqueur)
+        for (int i = 0 ; i < 3 ; i++){
+            for (int j = 0 ; j < 3 ; j++){
+                if (Objects.equals(caseTrouvee[i][j], "")){
+                    return "" ;
+                }
+            }
+        }
+        return "--" ;
     }
 
     /*Renvoie une liste aléatoire de how_much Pokemon à suggérer au joueur
@@ -173,9 +200,20 @@ public class GameController {
         estDevine[row][col] = valeur;
     }
 
-    /*================== FONCTIONS DE RENVOI DES DETAILS =================
-    * *********************************************************************/
+    /*Simule le tour d'un joueur => robot qui joue aléatoirement*/
+    public void tour_bot (){
+        Random random = new Random();
+        //Générer i et j
+        int i = random.nextInt(3);
+        int j = random.nextInt(3);
 
-    //A faire 
+        //Générer un nombre aléatoire pour le Pokémon à proposer
+        int randomNum = random.nextInt(1025) + 1;
+        Pokemon pkmn = getPokemon(randomNum);
 
+        while (checkReponse(pkmn, i, j, "bot") == -1){
+            randomNum = random.nextInt(1025) + 1;
+            pkmn = getPokemon(randomNum);
+        }
+    }
 }
