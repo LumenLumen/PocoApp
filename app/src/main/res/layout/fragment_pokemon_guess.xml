@@ -1,14 +1,237 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/pokemonGuessLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PokemonGuessFragment">
+    android:background="@color/primaryColor"
+    android:padding="8dp"
+    android:fillViewport="true">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/pokemon_list"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:numColumns="3"
-        android:layout_margin="8dp"/>
+        android:orientation="vertical">
 
-</FrameLayout>
+        <!-- Liste des Pokémon -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/pokemon_list"
+            android:layout_width="match_parent"
+            android:layout_height="280dp"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Barre de saisie + bouton -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+
+            <EditText
+                android:id="@+id/pokemonAutoCompleteTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="#FFFFFF"
+                android:hint="Entrez un nom de Pokémon"
+                android:padding="10dp"
+                android:textColor="@color/myTextColor"
+                android:textColorHint="@color/text" />
+
+            <Button
+                android:id="@+id/submitButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Valider"
+                android:textColor="@color/myTextColor"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
+
+        <!-- Types Pokémon -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:layout_marginBottom="16dp">
+
+            <!-- Types Pokémon (à gauche) -->
+
+            <!-- Indices Poids / Taille / Génération (à droite) -->
+            <GridLayout
+                android:id="@+id/typesContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:alignmentMode="alignMargins"
+                android:columnCount="4"
+                android:padding="4dp">
+
+                <!-- Tous les types ici comme tu as déjà -->
+                <ImageView
+                    android:id="@+id/type_feu"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_margin="3dp"
+                    android:src="@drawable/type_feu" />
+
+                <ImageView
+                    android:id="@+id/type_eau"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_margin="3dp"
+                    android:src="@drawable/type_eau" />
+
+                <ImageView
+                    android:id="@+id/type_plante"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_margin="3dp"
+                    android:src="@drawable/type_plante" />
+
+                <ImageView
+                    android:id="@+id/type_electrik"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_margin="3dp"
+                    android:src="@drawable/type_electrik" />
+
+                <ImageView
+                    android:id="@+id/type_acier"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_margin="3dp"
+                    android:src="@drawable/type_acier" />
+
+                <ImageView
+                    android:id="@+id/type_combat"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_margin="3dp"
+                    android:src="@drawable/type_combat" />
+
+                <ImageView
+                    android:id="@+id/type_dragon"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_margin="3dp"
+                    android:src="@drawable/type_dragon" />
+
+                <ImageView
+                    android:id="@+id/type_fee"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_margin="3dp"
+                    android:src="@drawable/type_fee" />
+
+                <ImageView
+                    android:id="@+id/type_glace"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_margin="3dp"
+                    android:src="@drawable/type_glace" />
+
+                <ImageView
+                    android:id="@+id/type_insecte"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_margin="3dp"
+                    android:src="@drawable/type_insecte" />
+
+                <ImageView
+                    android:id="@+id/type_normal"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_margin="3dp"
+                    android:src="@drawable/type_normal" />
+
+                <ImageView
+                    android:id="@+id/type_poison"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_margin="3dp"
+                    android:src="@drawable/type_poison" />
+
+                <ImageView
+                    android:id="@+id/type_psy"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_margin="3dp"
+                    android:src="@drawable/type_psy" />
+
+                <ImageView
+                    android:id="@+id/type_roche"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_margin="3dp"
+                    android:src="@drawable/type_roche" />
+
+                <ImageView
+                    android:id="@+id/type_sol"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_margin="3dp"
+                    android:src="@drawable/type_sol" />
+
+                <ImageView
+                    android:id="@+id/type_spectre"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_margin="3dp"
+                    android:src="@drawable/type_spectre" />
+
+                <ImageView
+                    android:id="@+id/type_tenebres"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_margin="3dp"
+                    android:src="@drawable/type_tenebres" />
+
+                <ImageView
+                    android:id="@+id/type_vol"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_margin="3dp"
+                    android:src="@drawable/type_vol" />
+            </GridLayout>
+
+            <LinearLayout
+                android:layout_width="155dp"
+                android:layout_height="135dp"
+                android:background="@color/primaryColor"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <TextView
+                    android:id="@+id/generationHintTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:padding="4dp"
+                    android:text="Génération: ?"
+                    android:textColor="@color/myTextColor"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/weightHintTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:padding="4dp"
+                    android:text="Poids: ?"
+                    android:textColor="@color/myTextColor"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/sizeHintTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:padding="4dp"
+                    android:text="Taille: ?"
+                    android:textColor="@color/myTextColor"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

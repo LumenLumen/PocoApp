@@ -1,11 +1,11 @@
 package com.example.pocoapp;
 
-import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -13,55 +13,50 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
-import java.util.Locale;
 
 public class GameActivity extends AppCompatActivity {
 
+    private GameController gameController;
+    private View redIndicator, greenIndicator;
     public static MediaPlayer mediaPlayer;
     private boolean isMuted = false;
     private ImageButton btnMute;
-    private int currentPlayer = 1; // 1 pour Joueur 1, 2 pour Joueur 2
     private TextView timerText;
-    private CountDownTimer countDownTimer;
-    private int timeLeft = 15; // 15 secondes pour chaque joueur
-    private boolean isTimerRunning = false;
 
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(LocaleHelper.setLocale(newBase));
-    }
+    private int currentPlayer = 1; // 1 = Rouge, 2 = Vert
+    private CountDownTimer countDownTimer;
+    private boolean isTimerRunning = false;
+    private int timeLeft = 60; // Fixé à 60s
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        // Initialisation du singleton avec le contexte de l'application
-        GameController.getInstance().initContexte(getApplicationContext());
-        GameController.getInstance().initMorpion();
+        gameController = GameController.getInstance();
+        gameController.initContexte(getApplicationContext());
+        gameController.initMorpion();
 
         enableImmersiveMode();
+
         timerText = findViewById(R.id.timerText);
-        startTimer();
-        // Initialisation du son
+        btnMute = findViewById(R.id.btnMute);
+
         SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
         isMuted = prefs.getBoolean("isMuted", false);
+
         if (mediaPlayer == null) {
             mediaPlayer = MediaPlayer.create(this, R.raw.bourgenvol);
             mediaPlayer.setLooping(true);
             if (!isMuted) mediaPlayer.start();
         }
 
-        // Initialisation du bouton mute
-        btnMute = findViewById(R.id.btnMute);
         updateMuteIcon();
         btnMute.setOnClickListener(v -> toggleSound());
-        // Initialisation des joueurs
-        updatePlayerTurn();
 
-        // Ajouter la grille comme fragment principal
+        updatePlayerTurn();
+        startTimer();
         showGridFragment();
     }
 
@@ -74,71 +69,126 @@ public class GameActivity extends AppCompatActivity {
     public void showPokemonGuessFragment(int row, int col) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         PokemonGuessFragment guessFragment = PokemonGuessFragment.newInstance(row, col);
+        guessFragment.setOnGuessCompleteListener(() -> {
+            nextPlayerAfterGuess();
+        });
         transaction.replace(R.id.fragment_grid, guessFragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }
+
+    public String getCurrentPlayer() {
+
+        return currentPlayer == 1 ? "Rouge" : "Vert";
+    }
+
     private void startTimer() {
-        if (isTimerRunning) {
+        if (isTimerRunning && countDownTimer != null) {
             countDownTimer.cancel();
         }
 
-        countDownTimer = new CountDownTimer(timeLeft * 1000, 1000) {  // 1000ms = 1 seconde
+        countDownTimer = new CountDownTimer(60_000, 1_000) { // 60 secondes
             @Override
             public void onTick(long millisUntilFinished) {
-                timeLeft = (int) millisUntilFinished / 1000;
+                timeLeft = (int) (millisUntilFinished / 1000);
                 timerText.setText(String.valueOf(timeLeft));
             }
 
             @Override
             public void onFinish() {
-                // Changer de joueur lorsque le timer expire
                 changePlayer();
             }
         }.start();
+
         isTimerRunning = true;
     }
 
+    // Ajoutez ces variables membres
+    private boolean isBotTurn = false;
+
+    // Modifiez la méthode changePlayer()
     private void changePlayer() {
         currentPlayer = (currentPlayer == 1) ? 2 : 1;
-        updatePlayerTurn();  // Met à jour l'affichage du joueur courant
+        updatePlayerTurn();
+        GameController.getInstance().setPlayerRole(currentPlayer == 1 ? "Rouge" : "Vert");
 
-        // Redémarre le timer pour l'autre joueur
-        timeLeft = 15;  // Réinitialiser le timer
+        if(currentPlayer == 2) {
+            isBotTurn = true;
+            new Handler().postDelayed(this::handleBotTurn, 2000); // 2s de délai
+        } else {
+            isBotTurn = false;
+        }
+
         startTimer();
     }
 
-    private void updatePlayerTurn() {
-        // Si c'est le tour du Joueur 1
-        if (currentPlayer == 1) {
-            // Joueur 1 visible, Joueur 2 transparent
-            findViewById(R.id.player1_turn).setAlpha(1.0f);  // Joueur 1 opaque
-            findViewById(R.id.player2_turn).setAlpha(0.3f);  // Joueur 2 transparent
-        } else {
-            // Joueur 1 transparent, Joueur 2 visible
-            findViewById(R.id.player1_turn).setAlpha(0.3f);  // Joueur 1 transparent
-            findViewById(R.id.player2_turn).setAlpha(1.0f);  // Joueur 2 opaque
+    // Ajoutez cette méthode pour gérer le tour du bot
+    private void handleBotTurn() {
+        if(isBotTurn) {
+            GameController.getInstance().tour_bot();
+            checkVictory();
+
+            // Si la partie continue, repasse au joueur
+            if(GameController.getInstance().isGameOver().isEmpty()) {
+                changePlayer();
+            }
+        }
+    }
+
+    // Modifiez checkVictory()
+    private void checkVictory() {
+        String winner = GameController.getInstance().isGameOver();
+        String currentPlayerRole = getCurrentPlayer();  // On récupère le rôle du joueur actuel
+        if (!winner.isEmpty()) {
+            boolean isPlayerWinner = winner.equals(currentPlayerRole); // Vérifie si le rôle du gagnant correspond au rôle du joueur actuel
+
+            Intent intent = new Intent(this, ResultateActivity.class);
+            intent.putExtra("isPlayerWinner", isPlayerWinner);
+            startActivity(intent);
+            finish();
         }
     }
 
 
+    private void updatePlayerTurn() {
+        findViewById(R.id.player1_turn).setAlpha(currentPlayer == 1 ? 1.0f : 0.3f);
+        findViewById(R.id.player2_turn).setAlpha(currentPlayer == 2 ? 1.0f : 0.3f);
+    }
+
     private void toggleSound() {
         isMuted = !isMuted;
+
         SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
-        prefs.edit().putBoolean("isMuted", isMuted).apply();
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("isMuted", isMuted);
+        editor.apply();
 
         if (mediaPlayer != null) {
-            if (isMuted) mediaPlayer.pause();
-            else mediaPlayer.start();
+            if (isMuted) {
+                mediaPlayer.pause();
+                Log.d("DEBUG", "Musique en pause");
+            } else {
+                mediaPlayer.start();
+                Log.d("DEBUG", "Musique relancée");
+            }
         }
 
         updateMuteIcon();
     }
 
     private void updateMuteIcon() {
-        if (btnMute != null) {
-            btnMute.setImageResource(isMuted ? R.drawable.baseline_music_off_24 : R.drawable.baseline_music_note_24);
-        }
+        btnMute.setImageResource(isMuted ? R.drawable.baseline_music_off_24 : R.drawable.baseline_music_note_24);
+    }
+
+    public void onBackToMenuClick(View view) {
+        GameController.getInstance().resetGame();
+
+        Intent intent = new Intent(GameActivity.this, MainActivity.class);
+        startActivity(intent);
+
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
+        finish();
     }
 
     private void enableImmersiveMode() {
@@ -146,21 +196,60 @@ public class GameActivity extends AppCompatActivity {
         decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+
         decorView.setOnSystemUiVisibilityChangeListener(visibility -> enableImmersiveMode());
     }
+
+    public void nextPlayerAfterGuess() {
+        changePlayer();
+
+
+        // Rafraîchir la grille
+        Fragment gridFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_grid);
+        if (gridFragment instanceof GridFragment) {
+            ((GridFragment) gridFragment).refreshGrid();
+        }
+        checkVictory();
+        startTimer();
+
+    }
+    public void handleCorrectGuess() {
+        nextPlayerAfterGuess();
+    }
+
+
     @Override
     protected void onPause() {
         super.onPause();
-        if (isTimerRunning) {
+        if (isTimerRunning && countDownTimer != null) {
             countDownTimer.cancel();
+            isTimerRunning = false;
+        }
+        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (isTimerRunning) {
+
+        if (!isTimerRunning) {
             startTimer();
         }
+
+        if (mediaPlayer != null && !isMuted) {
+            mediaPlayer.start();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+
     }
 }

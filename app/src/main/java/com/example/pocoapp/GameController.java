@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
 
@@ -32,6 +33,14 @@ public class GameController {
             }
         }
     }
+    private String opponentEndpointId;
+    public void setOpponentEndpointId(String id) { this.opponentEndpointId = id; }
+    public String getOpponentEndpointId() { return opponentEndpointId; }
+
+    private String playerRole = "Rouge"; // Valeur par défaut
+    public void setPlayerRole(String role) { this.playerRole = role; }
+    public String getPlayerRole() { return playerRole; }
+
 
     /*Méthode de classe pour obtenir l'instance de GameController ou la créer*/
     public static synchronized GameController getInstance() {
@@ -45,6 +54,7 @@ public class GameController {
     public void initContexte(Context context) {
         this.context = context.getApplicationContext(); // on garde le contexte d'application, évite les fuites de mémoire
     }
+
 
     /*Initialise la grille de morpion avec des Pokémons à trouver.*/
     public void initMorpion (){
@@ -86,8 +96,8 @@ public class GameController {
                     String[] ligne = line.split(";");
                     pkmn.setEnglish_name(ligne[0]);
                     pkmn.setFrench_name(ligne[1]);
-                    pkmn.setTaille(Float.parseFloat(ligne[2]));
-                    pkmn.setPoids(Float.parseFloat(ligne[3]));
+                    pkmn.setTaille(Float.parseFloat(ligne[3]));
+                    pkmn.setPoids(Float.parseFloat(ligne[2]));
                     pkmn.setImage(ligne[4]);
 
                     String[] types = new String[2];
@@ -127,16 +137,17 @@ public class GameController {
     * Renvoie 1 si c'est la bonne réponse -> édite les cases du morpion */
     public int checkReponse(Pokemon pkmn, int i, int j, String joueur){
         if (isAlreadySaid(pkmn, i, j) || !Objects.equals(caseTrouvee[i][j], "")){
-            return -1 ;
+            return -1;
         }
-        else if (pkmn == pkmnATrouver[i][j]){
-            caseTrouvee[i][j] = joueur ;
-            return 1 ;
+        else if (pkmn.getId() == pkmnATrouver[i][j].getId()) { // <-- Modification clé ici
+            caseTrouvee[i][j] = joueur;
+            estDevine[i][j] = true;
+            return 1;
         }
         else {
             informations[i][j].updateInformations(pkmn);
             pkmnDejaDit[i][j].add(pkmn);
-            return 0 ;
+            return 0;
         }
     }
 
@@ -207,13 +218,91 @@ public class GameController {
         int i = random.nextInt(3);
         int j = random.nextInt(3);
 
+
+    /*================== FONCTIONS DE RENVOI DES DETAILS =================
+    * *********************************************************************/
+
         //Générer un nombre aléatoire pour le Pokémon à proposer
         int randomNum = random.nextInt(1025) + 1;
         Pokemon pkmn = getPokemon(randomNum);
+    //A faire
 
         while (checkReponse(pkmn, i, j, "bot") == -1){
             randomNum = random.nextInt(1025) + 1;
             pkmn = getPokemon(randomNum);
         }
     }
+    /* Cherche un Pokémon par son nom français dans le fichier de DB.*/
+    public Pokemon getPokemonByName(String frenchName) {
+        if (context == null || frenchName == null || frenchName.trim().isEmpty()) {
+            return null; // Contexte non initialisé ou nom invalide
+        }
+
+        Pokemon pkmn = null; // Initialiser à null
+
+        try {
+            // Ouvre le fichier dbPoke.txt depuis les assets
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(context.getAssets().open("dbPoke.txt"))
+            );
+
+            String line;
+            int currentId = 0;
+            while ((line = reader.readLine()) != null) {
+                currentId++; // Garder une trace de l'ID si nécessaire
+                String[] data = line.split(";");
+                frenchName = frenchName.trim()
+                        .toLowerCase(Locale.FRENCH);
+                // Index 1 correspond au nom français dans notre structure de fichier
+                if (data.length > 7 && data[1] != null && data[1].equalsIgnoreCase(frenchName.trim())) {
+                    // Pokémon trouvé ! Créez et remplissez l'objet Pokemon
+                    pkmn = new Pokemon();
+                    pkmn.setEnglish_name(data[0]);
+                    pkmn.setFrench_name(data[1]);
+                    try { // Ajouter des try-catch pour le parsing
+                        pkmn.setTaille(Float.parseFloat(data[2].replace(',', '.'))); // Gérer la virgule potentielle
+                        pkmn.setPoids(Float.parseFloat(data[3].replace(',', '.'))); // Gérer la virgule potentielle
+                        pkmn.setGeneration(Integer.parseInt(data[7]));
+                    } catch (NumberFormatException e) {
+                        System.err.println("Erreur de format Nombre pour " + data[1] + ": " + e.getMessage());
+                        // Optionnel : retourner null ou continuer avec des valeurs par défaut
+                        return null; // Ou pkmn = null; break;
+                    }
+                    pkmn.setImage(data[4]);
+
+                    String[] types = new String[2];
+                    types[0] = (data[5] != null && !data[5].equalsIgnoreCase("null")) ? data[5].toLowerCase() : null; // Mettre en minuscule et gérer "null"
+                    types[1] = (data[6] != null && !data[6].equalsIgnoreCase("null")) ? data[6].toLowerCase() : null; // Mettre en minuscule et gérer "null"
+                    pkmn.setTypes(types);
+
+                    pkmn.setId(currentId); // Assigner l'ID basé sur la ligne
+                    break; // Sortir de la boucle une fois trouvé
+                }
+            }
+            reader.close(); // Fermer le reader
+
+        } catch (IOException e) {
+            System.err.println("Erreur lors de la lecture de dbPoke.txt pour getPokemonByName: " + e);
+            // Gérer l'erreur, peut-être retourner null
+            return null;
+        }
+
+        return pkmn; // Retourne le Pokémon trouvé ou null s'il n'a pas été trouvé
+    }
+    public void resetGame() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                pkmnATrouver[i][j] = null;
+                caseTrouvee[i][j] = "";
+                pkmnDejaDit[i][j].clear();
+                informations[i][j] = null;
+                estDevine[i][j] = false;
+            }
+        }
+    }
+    public String getCaseGagnee(int row, int col) {
+        return caseTrouvee[row][col];
+    }
+
 }
+

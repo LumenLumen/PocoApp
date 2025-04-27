@@ -1,43 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/gameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
     android:background="@color/primaryColor"
     tools:context=".GameActivity">
 
-    <!-- Conteneur pour les indicateurs de tour et le timer -->
-
-    <!-- Grille du jeu -->
-
+    <!-- Barre du haut : joueurs et chrono -->
     <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:gravity="center|start|top">
+        android:id="@+id/topBar"
+        android:layout_width="411dp"
+        android:layout_height="141dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Joueur 1 (Rouge) - Oval -->
         <View
             android:id="@+id/player1_turn"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_alignParentStart="true"
-            android:layout_marginStart="16dp"
             android:background="@drawable/oval_red" />
 
-        <!-- Joueur 2 (Vert) - Oval -->
         <View
             android:id="@+id/player2_turn"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="16dp"
             android:background="@drawable/oval_green" />
 
-        <!-- Timer au centre -->
         <TextView
             android:id="@+id/timerText"
             android:layout_width="wrap_content"
@@ -49,25 +44,52 @@
             android:textStyle="bold" />
     </RelativeLayout>
 
+    <!-- Grille centrée et agrandie -->
+
+    <!-- Bouton mute en bas à droite -->
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_grid"
         android:name="com.example.pocoapp.GridFragment"
-        android:layout_width="378dp"
-        android:layout_height="308dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginLeft="7dp"
-        android:layout_marginTop="50dp"
-        android:gravity="center" />
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/btnMute"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintVertical_bias="1.0" />
 
     <ImageButton
         android:id="@+id/btnMute"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_gravity="bottom|left"
-        android:layout_marginTop="16dp"
-        android:background="@color/myTextColor"
+        android:layout_margin="16dp"
+        android:background="@android:color/transparent"
         android:backgroundTint="@android:color/transparent"
         android:contentDescription="Toggle Music"
-        android:src="@drawable/baseline_music_note_24" />
-</LinearLayout>
+        android:src="@drawable/baseline_music_note_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageButton
+        android:id="@+id/btnBackToMenu"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="300dp"
+        android:layout_marginBottom="15dp"
+        android:background="@android:color/transparent"
+        android:backgroundTint="@android:color/transparent"
+        android:contentDescription="retour menu"
+        android:onClick="onBackToMenuClick"
+        android:src="@drawable/baseline_keyboard_return_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btnMute"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:foregroundGravity="bottom" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
