@@ -2,6 +2,8 @@ package com.example.pocoapp;
 
 import androidx.annotation.NonNull;
 
+import java.util.HashSet;
+
 public class Pokemon {
     private int id ;
     private String english_name;
@@ -82,5 +84,23 @@ public class Pokemon {
     public void setImage(String image) {
         this.image = image;
     }
+    public boolean hasTypes(HashSet<String> correctTypes) {
+        for (String type : this.getTypes()) {
+            if (correctTypes.contains(type.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasAtLeastOneType(HashSet<String> correctTypes) {
+        for (String type : this.getTypes()) {
+            if (correctTypes.contains(type.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 }

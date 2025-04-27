@@ -1,6 +1,7 @@
 package com.example.pocoapp;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,19 +55,25 @@ public class PokemonGridAdapter extends RecyclerView.Adapter<PokemonGridAdapter.
         });
     }
 
+    private boolean isPlayerTurn() {
+        // Vérifie via le GameController si c'est le tour du joueur
+        return GameController.getInstance().getPlayerRole()
+                .equals(((GameActivity) context).getCurrentPlayer());
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        ImageView pokemonImageView;
+        TextView pokemonName; // Ajouté
+
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            pokemonImageView = itemView.findViewById(R.id.pokemonImageView);
+            pokemonName = itemView.findViewById(R.id.pokemonName); // Correspond à votre XML
+        }
+    }
     @Override
     public int getItemCount() {
         return pokemonNames.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView pokemonImageView;
-        TextView pokemonName;
-
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            pokemonImageView = itemView.findViewById(R.id.pokemonImageView);
-
-        }
-    }
 }

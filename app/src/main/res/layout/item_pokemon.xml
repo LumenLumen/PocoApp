@@ -10,4 +10,10 @@
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:scaleType="fitCenter"/>
+    <TextView
+        android:id="@+id/pokemonName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/myTextColor"
+        android:textSize="12sp"/>
 </FrameLayout>

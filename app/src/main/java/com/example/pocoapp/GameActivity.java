@@ -1,20 +1,22 @@
 package com.example.pocoapp;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 public class GameActivity extends AppCompatActivity {
+
     private GameController gameController;
     private View redIndicator, greenIndicator;
     public static MediaPlayer mediaPlayer;
@@ -25,15 +27,16 @@ public class GameActivity extends AppCompatActivity {
     private int currentPlayer = 1; // 1 = Rouge, 2 = Vert
     private CountDownTimer countDownTimer;
     private boolean isTimerRunning = false;
-    private int timeLeft = 15;
+    private int timeLeft = 60; // Fixé à 60s
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        GameController.getInstance().initContexte(getApplicationContext());
-        GameController.getInstance().initMorpion();
+        gameController = GameController.getInstance();
+        gameController.initContexte(getApplicationContext());
+        gameController.initMorpion();
 
         enableImmersiveMode();
 
@@ -66,19 +69,25 @@ public class GameActivity extends AppCompatActivity {
     public void showPokemonGuessFragment(int row, int col) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         PokemonGuessFragment guessFragment = PokemonGuessFragment.newInstance(row, col);
+        guessFragment.setOnGuessCompleteListener(() -> {
+            nextPlayerAfterGuess();
+        });
         transaction.replace(R.id.fragment_grid, guessFragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }
 
-    public void handleCorrectGuess() {
-        changePlayer(); // Change de joueur uniquement si la réponse est correcte
+    public String getCurrentPlayer() {
+
+        return currentPlayer == 1 ? "Rouge" : "Vert";
     }
 
     private void startTimer() {
-        if (isTimerRunning) countDownTimer.cancel();
+        if (isTimerRunning && countDownTimer != null) {
+            countDownTimer.cancel();
+        }
 
-        countDownTimer = new CountDownTimer(15_000, 1_000) {
+        countDownTimer = new CountDownTimer(60_000, 1_000) { // 60 secondes
             @Override
             public void onTick(long millisUntilFinished) {
                 timeLeft = (int) (millisUntilFinished / 1000);
@@ -94,12 +103,52 @@ public class GameActivity extends AppCompatActivity {
         isTimerRunning = true;
     }
 
+    // Ajoutez ces variables membres
+    private boolean isBotTurn = false;
+
+    // Modifiez la méthode changePlayer()
     private void changePlayer() {
         currentPlayer = (currentPlayer == 1) ? 2 : 1;
         updatePlayerTurn();
-        timeLeft = 15;
+        GameController.getInstance().setPlayerRole(currentPlayer == 1 ? "Rouge" : "Vert");
+
+        if(currentPlayer == 2) {
+            isBotTurn = true;
+            new Handler().postDelayed(this::handleBotTurn, 2000); // 2s de délai
+        } else {
+            isBotTurn = false;
+        }
+
         startTimer();
     }
+
+    // Ajoutez cette méthode pour gérer le tour du bot
+    private void handleBotTurn() {
+        if(isBotTurn) {
+            GameController.getInstance().tour_bot();
+            checkVictory();
+
+            // Si la partie continue, repasse au joueur
+            if(GameController.getInstance().isGameOver().isEmpty()) {
+                changePlayer();
+            }
+        }
+    }
+
+    // Modifiez checkVictory()
+    private void checkVictory() {
+        String winner = GameController.getInstance().isGameOver();
+        String currentPlayerRole = getCurrentPlayer();  // On récupère le rôle du joueur actuel
+        if (!winner.isEmpty()) {
+            boolean isPlayerWinner = winner.equals(currentPlayerRole); // Vérifie si le rôle du gagnant correspond au rôle du joueur actuel
+
+            Intent intent = new Intent(this, ResultateActivity.class);
+            intent.putExtra("isPlayerWinner", isPlayerWinner);
+            startActivity(intent);
+            finish();
+        }
+    }
+
 
     private void updatePlayerTurn() {
         findViewById(R.id.player1_turn).setAlpha(currentPlayer == 1 ? 1.0f : 0.3f);
@@ -109,7 +158,6 @@ public class GameActivity extends AppCompatActivity {
     private void toggleSound() {
         isMuted = !isMuted;
 
-        // Sauvegarde du statut du son dans les préférences
         SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean("isMuted", isMuted);
@@ -118,10 +166,10 @@ public class GameActivity extends AppCompatActivity {
         if (mediaPlayer != null) {
             if (isMuted) {
                 mediaPlayer.pause();
-                Log.d("DEBUG", "MainActivity - Musique en pause");
+                Log.d("DEBUG", "Musique en pause");
             } else {
                 mediaPlayer.start();
-                Log.d("DEBUG", "MainActivity - Musique relancée");
+                Log.d("DEBUG", "Musique relancée");
             }
         }
 
@@ -131,14 +179,14 @@ public class GameActivity extends AppCompatActivity {
     private void updateMuteIcon() {
         btnMute.setImageResource(isMuted ? R.drawable.baseline_music_off_24 : R.drawable.baseline_music_note_24);
     }
+
     public void onBackToMenuClick(View view) {
-        // Crée un Intent pour revenir à l'écran principal
+        GameController.getInstance().resetGame();
+
         Intent intent = new Intent(GameActivity.this, MainActivity.class);
-        startActivity(intent); // Démarre l'activité principale
+        startActivity(intent);
 
-        // Facultatif : Ajoute un effet de transition entre les activités
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-
 
         finish();
     }
@@ -148,18 +196,60 @@ public class GameActivity extends AppCompatActivity {
         decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+
         decorView.setOnSystemUiVisibilityChangeListener(visibility -> enableImmersiveMode());
     }
+
+    public void nextPlayerAfterGuess() {
+        changePlayer();
+
+
+        // Rafraîchir la grille
+        Fragment gridFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_grid);
+        if (gridFragment instanceof GridFragment) {
+            ((GridFragment) gridFragment).refreshGrid();
+        }
+        checkVictory();
+        startTimer();
+
+    }
+    public void handleCorrectGuess() {
+        nextPlayerAfterGuess();
+    }
+
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (isTimerRunning) countDownTimer.cancel();
+        if (isTimerRunning && countDownTimer != null) {
+            countDownTimer.cancel();
+            isTimerRunning = false;
+        }
+        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (!isTimerRunning) startTimer();
+
+        if (!isTimerRunning) {
+            startTimer();
+        }
+
+        if (mediaPlayer != null && !isMuted) {
+            mediaPlayer.start();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+
     }
 }

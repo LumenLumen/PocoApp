@@ -37,10 +37,9 @@ public class ResultateActivity extends AppCompatActivity {
         resultText = findViewById(R.id.resultText);
 
 
-        boolean isWin = getIntent().getBooleanExtra("IS_WIN", false);
-        Log.d("DEBUG", "isWin = " + isWin);
+        boolean isPlayerWinner = getIntent().getBooleanExtra("isPlayerWinner", true);
 
-        if (isWin) {
+        if (!isPlayerWinner) {
             resultText.setText(getString(R.string.victoire));
             showVictoryScreen();
         } else {

@@ -6,7 +6,7 @@
     <string name="solo_subtitle">Défier la machine</string>
     <string name="mute">Couper le son</string>
     <string name="unmute">Activer le son</string>
-    <string name="multi_subtitle">trouver un adversaire</string>
+    <string name="multi_subtitle">Trouver un adversaire</string>
     <string name="search_opponent">Recherche d\'un adversaire</string>
     <string name="opponent_found_connecting">Adversaire trouvé, connexion en cours...</string>
     <string name="opponent_not_found">Aucun adversaire trouvé...</string>

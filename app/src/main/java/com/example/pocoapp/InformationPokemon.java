@@ -31,10 +31,9 @@ public class InformationPokemon {
         generation_min = 1;
     }
 
-    public void updateInformations (Pokemon submission){
-
-        //Update de poids min et max
-        if (submission.getPoids() == this.aTrouver.getPoids()){
+    public void updateInformations(Pokemon submission) {
+        // Update poids
+        if (submission.getPoids() == this.aTrouver.getPoids()) {
             this.poids_max = this.poids_min = submission.getPoids();
         } else if (submission.getPoids() > this.aTrouver.getPoids() && submission.getPoids() < this.poids_max) {
             this.poids_max = submission.getPoids();
@@ -42,8 +41,8 @@ public class InformationPokemon {
             this.poids_min = submission.getPoids();
         }
 
-        //Update de taille min et max
-        if (submission.getTaille() == this.aTrouver.getTaille()){
+        // Update taille
+        if (submission.getTaille() == this.aTrouver.getTaille()) {
             this.taille_max = this.taille_min = submission.getTaille();
         } else if (submission.getTaille() > this.aTrouver.getTaille() && submission.getTaille() < this.taille_max) {
             this.taille_max = submission.getTaille();
@@ -51,38 +50,51 @@ public class InformationPokemon {
             this.taille_min = submission.getTaille();
         }
 
-        //Update de gen min et max
-        if (submission.getGeneration() == this.aTrouver.getGeneration()){
+        // Update génération
+        if (submission.getGeneration() == this.aTrouver.getGeneration()) {
             this.generation_max = this.generation_min = submission.getGeneration();
-        } else if (submission.getGeneration() > this.aTrouver.getGeneration() && submission.getGeneration() < this.taille_max) {
+        } else if (submission.getGeneration() > this.aTrouver.getGeneration() && submission.getGeneration() < this.generation_max) {
             this.generation_max = submission.getGeneration();
-        } else if (submission.getGeneration() < this.aTrouver.getGeneration() && submission.getGeneration() > this.taille_min) {
+        } else if (submission.getGeneration() < this.aTrouver.getGeneration() && submission.getGeneration() > this.generation_min) {
             this.generation_min = submission.getGeneration();
         }
 
-        //Update des types
-        if (Objects.equals(submission.getTypes()[0], this.aTrouver.getTypes()[0]) || Objects.equals(submission.getTypes()[0], this.aTrouver.getTypes()[1])){
-            this.types_identiques.add(submission.getTypes()[0]);
+        // Update types
+        if (Objects.equals(submission.getTypes()[0], this.aTrouver.getTypes()[0]) || Objects.equals(submission.getTypes()[0], this.aTrouver.getTypes()[1])) {
+            if (submission.getTypes()[0] != null && !"null".equalsIgnoreCase(submission.getTypes()[0])) {
+                this.types_identiques.add(submission.getTypes()[0].toLowerCase());
+            }
         }
-        if (Objects.equals(submission.getTypes()[1], this.aTrouver.getTypes()[0]) || Objects.equals(submission.getTypes()[1], this.aTrouver.getTypes()[1])){
-            this.types_identiques.add(submission.getTypes()[1]);
+        if (Objects.equals(submission.getTypes()[1], this.aTrouver.getTypes()[0]) || Objects.equals(submission.getTypes()[1], this.aTrouver.getTypes()[1])) {
+            if (submission.getTypes()[1] != null && !"null".equalsIgnoreCase(submission.getTypes()[1])) {
+                this.types_identiques.add(submission.getTypes()[1].toLowerCase());
+            }
         }
 
-        if (this.types_identiques.size() == 2){
-            ArrayList<String> types = new ArrayList<>(Arrays.asList("normal", "fire", "water", "electric", "grass", "ice", "fighting", "poison", "ground", "flying", "psychic", "bug", "rock", "ghost", "dragon", "dark", "steel", "fairy"));
-            types.removeIf(this.types_identiques::contains);
+        if (this.types_identiques.size() == (this.aTrouver.getTypes()[1] == null || "null".equalsIgnoreCase(this.aTrouver.getTypes()[1]) ? 1 : 2)) {
+            // Tous les bons types trouvés, on remplit les types faux
+            ArrayList<String> types = new ArrayList<>(Arrays.asList(
+                    "feu", "eau", "plante", "electrik", "acier", "combat", "dragon", "fee",
+                    "glace", "insecte", "normal", "poison", "psy", "roche",
+                    "sol", "spectre", "tenebres", "vol"
+            ));
+            types.removeAll(this.types_identiques);
             this.types_differents.addAll(types);
-            return; //On connait les types alors on mets fin à l'exécution de la fonction.
+            return;
         }
 
-        if (!Objects.equals(submission.getTypes()[0], this.aTrouver.getTypes()[0]) && !Objects.equals(submission.getTypes()[0], this.aTrouver.getTypes()[1])){
-            this.types_differents.add(submission.getTypes()[0]);
+        if (submission.getTypes()[0] != null && !"null".equalsIgnoreCase(submission.getTypes()[0])
+                && !Objects.equals(submission.getTypes()[0], this.aTrouver.getTypes()[0])
+                && !Objects.equals(submission.getTypes()[0], this.aTrouver.getTypes()[1])) {
+            this.types_differents.add(submission.getTypes()[0].toLowerCase());
         }
-        if (!Objects.equals(submission.getTypes()[1], this.aTrouver.getTypes()[0]) && !Objects.equals(submission.getTypes()[1], this.aTrouver.getTypes()[1])){
-            this.types_differents.add(submission.getTypes()[1]);
+        if (submission.getTypes()[1] != null && !"null".equalsIgnoreCase(submission.getTypes()[1])
+                && !Objects.equals(submission.getTypes()[1], this.aTrouver.getTypes()[0])
+                && !Objects.equals(submission.getTypes()[1], this.aTrouver.getTypes()[1])) {
+            this.types_differents.add(submission.getTypes()[1].toLowerCase());
         }
-
     }
+
 
     public HashSet<String> getTypes_identiques() {
         return types_identiques;
