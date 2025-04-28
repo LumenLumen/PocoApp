@@ -114,6 +114,7 @@ public class GridFragment extends Fragment {
             // Pokemon not yet found
             gridButtons[row][col].setText("?");
 
+           // button.setText(pokemon.getFrench_name());
             button.setBackgroundResource(android.R.color.transparent);
         }
     }
