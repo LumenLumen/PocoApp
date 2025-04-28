@@ -33,22 +33,27 @@ public class InformationPokemon {
         if (submission == null || submission.getTypes() == null || aTrouver == null || aTrouver.getTypes() == null) return;
 
         // Poids
-        if (submission.getPoids() == aTrouver.getPoids()) {
-            poids_min = poids_max = submission.getPoids();
-        } else if (submission.getPoids() > aTrouver.getPoids() && submission.getPoids() < poids_max) {
-            poids_max = submission.getPoids();
+        if (submission.getPoids() == this.aTrouver.getPoids()) {
+            this.poids_min = this.poids_max = submission.getPoids();
+        } else if (submission.getPoids() > this.aTrouver.getPoids() && submission.getPoids() < this.poids_max) {
+            this.poids_max = submission.getPoids();
         } else if (submission.getPoids() < aTrouver.getPoids() && submission.getPoids() > poids_min) {
-            poids_min = submission.getPoids();
+            this.poids_min = submission.getPoids();
         }
 
         // Taille
-        if (submission.getTaille() == aTrouver.getTaille()) {
-            taille_min = taille_max = submission.getTaille();
-        } else if (submission.getTaille() > aTrouver.getTaille() && submission.getTaille() < taille_max) {
-            taille_max = submission.getTaille();
-        } else if (submission.getTaille() < aTrouver.getTaille() && submission.getTaille() > taille_min) {
-            taille_min = submission.getTaille();
+        if (submission.getTaille() == this.aTrouver.getTaille()) {
+            this.taille_min = this.taille_max = submission.getTaille();
+        } else if (submission.getTaille() > this.aTrouver.getTaille() && submission.getTaille() < this.taille_max) {
+            this.taille_max = submission.getTaille();
+        } else if (submission.getTaille() < this.aTrouver.getTaille() && submission.getTaille() > this.taille_min) {
+            this.taille_min = submission.getTaille();
         }
+
+        System.out.println(this.taille_max);
+        System.out.println(this.taille_min);
+        System.out.println(this.poids_max);
+        System.out.println(this.poids_min);
 
         // Génération
         if (submission.getGeneration() == aTrouver.getGeneration()) {

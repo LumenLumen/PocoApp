@@ -117,8 +117,8 @@ public class GameController {
 
                     try {
                         // Gérer la virgule potentielle pour les floats et vérifier la longueur des indices
-                        if (data.length > 2) pkmn.setTaille(Float.parseFloat(data[2].trim().replace(',', '.'))); else pkmn.setTaille(0);
-                        if (data.length > 3) pkmn.setPoids(Float.parseFloat(data[3].trim().replace(',', '.'))); else pkmn.setPoids(0);
+                        if (data.length > 2) pkmn.setPoids(Float.parseFloat(data[2].trim().replace(',', '.'))); else pkmn.setPoids(0);
+                        if (data.length > 3) pkmn.setTaille(Float.parseFloat(data[3].trim().replace(',', '.'))); else pkmn.setTaille(0);
                         if (data.length > 4) pkmn.setImage(data[4].trim()); else pkmn.setImage("");
 
 
