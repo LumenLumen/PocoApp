@@ -3,6 +3,7 @@ package com.example.pocoapp;
 import androidx.annotation.NonNull;
 
 import java.util.HashSet;
+import java.util.Objects;
 
 public class Pokemon {
     private int id ;
@@ -100,6 +101,18 @@ public class Pokemon {
             }
         }
         return false;
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Pokemon pokemon = (Pokemon) o;
+        return id == pokemon.id; // Compare based on the unique ID
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id); // Generate hash code based on the ID
     }
 
 
