@@ -45,6 +45,7 @@ public class PokemonGuessFragment extends Fragment {
     private TextView generationHintTextView;
     private int row, col;
 
+
     // Liste de tous les types (pour itérer facilement)
     private static final ArrayList<String> ALL_TYPES = new ArrayList<>(Arrays.asList(
             "feu", "eau", "plante", "electrik", "acier", "combat", "dragon", "fee",
@@ -241,22 +242,23 @@ public class PokemonGuessFragment extends Fragment {
 
     // Méthode spécifique pour les types (appelée par updateHints)
     private void updateTypeHintsUI(InformationPokemon info) {
-        // Réinitialiser tous les types à transparents
+        // Tous transparents au départ
         for (ImageView icon : typeIcons.values()) {
             icon.setAlpha(0.3f);
             icon.setBackground(null);
         }
 
-        // Mettre en surbrillance uniquement les types corrects trouvés
-        for (String correctType : info.getTypes_identiques()) {
-            if (correctType == null || correctType.equalsIgnoreCase("null")) continue; // Ignorer les nulls
-            ImageView icon = typeIcons.get(correctType.toLowerCase());
+        // Puis on affiche seulement les types trouvés
+        for (String type : info.getTypes_identiques()) {
+            if (type == null) continue;
+            ImageView icon = typeIcons.get(type.toLowerCase());
             if (icon != null) {
-                icon.setAlpha(1.0f); // Opaque
-                icon.setBackgroundResource(R.drawable.type_correct_background); // Surlignage vert
+                icon.setAlpha(1.0f);
+                icon.setBackgroundResource(R.drawable.type_correct_background);
             }
         }
     }
+
 
 
     private boolean isMyTurn() {
