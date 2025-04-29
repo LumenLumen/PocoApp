@@ -7,4 +7,4 @@ Rapport : https://docs.google.com/document/d/1Dj6SFso7IXL9DLlOhbNSm8bBP1d_FzW6XJ
 
 - Avoir Android Studio
 - Cloner le dépot (git clone) dans un projet Android
-- Lancer la simulation / lancer sur un appareil Android avec API 33 externe dans Android Studio
+- Lancer la simulation / lancer sur un appareil Android > 12 avec API 33 externe dans Android Studio
